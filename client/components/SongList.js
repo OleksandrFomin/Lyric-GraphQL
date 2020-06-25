@@ -5,7 +5,12 @@ import { GET_SONG_LIST } from "../queries/fetchSongs";
 import { DELETE_SONG } from "../mutations/deleteSong";
 
 const SongList = () => {
-  const { data, loading, error } = useQuery(GET_SONG_LIST);
+  const {
+    data: songListData,
+    loading: songListLoading,
+    error: songListError,
+  } = useQuery(GET_SONG_LIST);
+
   const [deleteSong] = useMutation(DELETE_SONG);
 
   const onDeleteHandler = (id) => {
@@ -15,22 +20,24 @@ const SongList = () => {
     });
   };
 
-  if (loading) return <div>Loading...</div>;
-  if (error || !data) return <p>ERROR</p>;
+  if (songListLoading) return <div>Loading...</div>;
+  if (songListError || !songListData) return <p>ERROR</p>;
 
   return (
-    <div>
+    <div style={style.container}>
       <ul style={style.listContainer}>
-        {data.songs.map(({ id, title }) => {
+        {songListData.songs.map(({ id, title }) => {
           return (
             <li key={id} style={style.listItem}>
-              <div>{title}</div>
+              <Link to={`/song/${id}`}>
+                <div>{title}</div>
+              </Link>
               <button onClick={() => onDeleteHandler(id)}>Delete</button>
             </li>
           );
         })}
       </ul>
-      <Link to="song/new">
+      <Link to="song/new" style={style.btnWrapper}>
         <button style={style.btn}>+</button>
       </Link>
     </div>
@@ -38,21 +45,34 @@ const SongList = () => {
 };
 
 const style = {
+  container: {
+    display: "flex",
+    flexDirection: "column",
+  },
+
   listContainer: {
-    margin: "10px",
+    margin: "10px 30px",
   },
   listItem: {
     padding: "20px 0",
     borderBottom: "1px solid black",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
-  btn: {
-    display: "block",
+
+  btnWrapper: {
     marginLeft: "auto",
-    marginRight: "30px",
-    marginTop: "30px",
+    marginRight: "20px",
+    marginTop: "20px",
+  },
+
+  btn: {
     width: "70px",
     height: "70px",
     borderRadius: "50%",
+    backgroundColor: "red",
+    color: "white",
   },
 };
 

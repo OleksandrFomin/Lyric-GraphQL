@@ -5,6 +5,7 @@ import { ApolloProvider } from "@apollo/react-hooks"; //connects ApolloClient to
 import SongList from "./components/SongList";
 import CreateSong from "./components/CreateSong";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import SongDetail from "./components/SongDetail";
 
 const client = new ApolloClient({});
 
@@ -13,6 +14,7 @@ const Root = () => {
     <Switch>
       <Route exact path="/" component={SongList} />
       <Route exact path="/song/new" component={CreateSong} />
+      <Route exact path="/song/:id" component={SongDetail} />
     </Switch>
   );
 };

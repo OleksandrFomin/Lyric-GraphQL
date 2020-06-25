@@ -1,24 +1,21 @@
-import React, { useState } from "react";
+import React from "react";
 
 import { useMutation } from "@apollo/react-hooks";
 import { useHistory, Link } from "react-router-dom";
 import { GET_SONG_LIST } from "../queries/fetchSongs";
-import { ADD_SONG } from "../queries/fetchSong";
+import { ADD_SONG } from "../mutations/addSongs";
+import useFormInput from "../hooks/useFormInput";
 
 const CreateSong = () => {
-  const [title, setTitle] = useState("");
+  const { inputValue, handleInputChange } = useFormInput();
+
   const history = useHistory();
-
   const [addSong, { data, loading, error }] = useMutation(ADD_SONG);
-
-  const handleChange = (e) => {
-    setTitle(e.target.value);
-  };
 
   const onFormSubmit = (e) => {
     e.preventDefault();
     addSong({
-      variables: { title: title },
+      variables: { title: inputValue },
       refetchQueries: [{ query: GET_SONG_LIST }], //refetches song list after mutation (downside: 2 newtwork requests). May also accept 'variables' if refetching  requires a parameter
     });
   };
@@ -33,7 +30,7 @@ const CreateSong = () => {
       <h3>Create a new song</h3>
       <form onSubmit={onFormSubmit}>
         <label>Song title:</label>
-        <input onChange={handleChange} value={title} />
+        <input onChange={handleInputChange} value={inputValue} />
         <button>Add Song</button>
       </form>
     </div>
