@@ -1,42 +1,59 @@
 import React from "react";
-import gql from "graphql-tag";
-import { useQuery } from "@apollo/react-hooks";
-
-const GET_SONG_LIST = gql`
-  query GetSongsList {
-    songs {
-      id
-      title
-    }
-  }
-`;
-
-// const GET_SONG = gql`
-//   query GetSong($id: ID!) {
-//     song(id: $id) {
-//       id
-//       title
-//     }
-//   }
-// `;
+import { useQuery, useMutation } from "@apollo/react-hooks";
+import { Link } from "react-router-dom";
+import { GET_SONG_LIST } from "../queries/fetchSongs";
+import { DELETE_SONG } from "../mutations/deleteSong";
 
 const SongList = () => {
   const { data, loading, error } = useQuery(GET_SONG_LIST);
+  const [deleteSong] = useMutation(DELETE_SONG);
+
+  const onDeleteHandler = (id) => {
+    deleteSong({
+      variables: { id: id },
+      refetchQueries: [{ query: GET_SONG_LIST }],
+    });
+  };
+
   if (loading) return <div>Loading...</div>;
   if (error || !data) return <p>ERROR</p>;
 
-  // const handleClick = (id) => {
-  //   const { data, loading, error } = useQuery(GET_SONG, { variables: { id } });
-  //   console.log(data.title);
-  // };
+  return (
+    <div>
+      <ul style={style.listContainer}>
+        {data.songs.map(({ id, title }) => {
+          return (
+            <li key={id} style={style.listItem}>
+              <div>{title}</div>
+              <button onClick={() => onDeleteHandler(id)}>Delete</button>
+            </li>
+          );
+        })}
+      </ul>
+      <Link to="song/new">
+        <button style={style.btn}>+</button>
+      </Link>
+    </div>
+  );
+};
 
-  return data.songs.map((song) => {
-    return (
-      <div key={song.id}>
-        <button onClick={() => handleClick(song.id)}>{song.title}</button>
-      </div>
-    );
-  });
+const style = {
+  listContainer: {
+    margin: "10px",
+  },
+  listItem: {
+    padding: "20px 0",
+    borderBottom: "1px solid black",
+  },
+  btn: {
+    display: "block",
+    marginLeft: "auto",
+    marginRight: "30px",
+    marginTop: "30px",
+    width: "70px",
+    height: "70px",
+    borderRadius: "50%",
+  },
 };
 
 export default SongList;
